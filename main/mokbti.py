@@ -412,17 +412,17 @@ def plot_voice_bti_donut(bti_res):
         rotation=90,
     )])
 
-    # 글자 겹침을 원천 차단하기 위해 유형명과 퍼센트를 2개의 독립된 어노테이션(y 좌표 분리)으로 배치
+    # 글자 겹침 및 배경/외곽선 짤림 방지: 넉넉한 높이(280px)와 안전 마진 적용
     fig.update_layout(
         showlegend=False,
-        margin=dict(t=10, b=10, l=10, r=10),
-        height=260,
+        margin=dict(t=16, b=16, l=16, r=16),
+        height=280,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         annotations=[
             dict(
                 text=f"<b>{top_type}</b>",
-                font=dict(size=24, color=top_color, family='Pretendard, Apple SD Gothic Neo, sans-serif'),
+                font=dict(size=24, color=top_color, family='Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif'),
                 x=0.5, y=0.57,
                 xref='paper', yref='paper',
                 showarrow=False,
@@ -430,7 +430,7 @@ def plot_voice_bti_donut(bti_res):
             ),
             dict(
                 text=f"<b>{top_pct}%</b>",
-                font=dict(size=20, color='#0F172A', family='Pretendard, Apple SD Gothic Neo, sans-serif'),
+                font=dict(size=20, color='#0F172A', family='Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif'),
                 x=0.5, y=0.43,
                 xref='paper', yref='paper',
                 showarrow=False,
@@ -722,6 +722,13 @@ st.markdown("""
     <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
+    /* Streamlit 상단 기본 툴바 투명화 및 높이 정리 */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+        height: 2.8rem !important;
+        z-index: 1 !important;
+    }
+
     /* PC에서도 모바일 비율을 완벽히 유지하도록 컨테이너 최대 폭 460px 고정 및 중앙 정렬 */
     .stApp {
         background-color: #F1F5F9 !important;
@@ -732,7 +739,10 @@ st.markdown("""
         max-width: 460px !important;
         width: 100% !important;
         margin: 0 auto !important;
-        padding: 1.5rem 14px 3rem 14px !important;
+        padding-top: 3.8rem !important; /* 상단 제목 짤림 100% 방지 */
+        padding-bottom: 3rem !important;
+        padding-left: 14px !important;
+        padding-right: 14px !important;
         background-color: #FFFFFF !important;
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08) !important;
         min-height: 100vh !important;
@@ -742,8 +752,9 @@ st.markdown("""
         .block-container {
             max-width: 100% !important;
             box-shadow: none !important;
-            padding-left: 10px !important;
-            padding-right: 10px !important;
+            padding-top: 4.0rem !important; /* 모바일에서도 상단 메뉴바와 제목 겹침 방지 */
+            padding-left: 12px !important;
+            padding-right: 12px !important;
         }
     }
 
@@ -1294,8 +1305,12 @@ if audio_bytes_data is not None and len(audio_bytes_data) > 0:
 
     # 3. 5대 목BTI 유형별 점유율 및 원 그래프 (Donut Chart)
     st.markdown("### 📊 5대 목BTI 유형별 점유율")
+    st.markdown("""
+        <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:6px 10px; box-shadow:0 4px 14px rgba(0,0,0,0.04); margin-bottom:14px;">
+    """, unsafe_allow_html=True)
     fig_donut = plot_voice_bti_donut(bti_res)
     st.plotly_chart(fig_donut, use_container_width=True, config={'displayModeBar': False})
+    st.markdown("</div>", unsafe_allow_html=True)
 
     # 5대 유형 랭킹 카드 리스트 (모바일 최적화)
     card_htmls = []
